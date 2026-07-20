@@ -409,4 +409,10 @@ function startImageHealthCheckCron() {
   console.log('[CRON] 24-Hour image verification cron scheduler initialized.');
 }
 
-startServer();
+if (process.env.VERCEL) {
+  // Export app for Vercel serverless execution
+  module.exports = app;
+} else {
+  // Start server locally
+  startServer();
+}
