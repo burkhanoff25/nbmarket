@@ -1,7 +1,25 @@
+const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dbPath = path.resolve(__dirname, 'market.db');
+let dbPath = path.resolve(__dirname, 'market.db');
+
+if (process.env.VERCEL) {
+  const tmpDbPath = path.join('/tmp', 'market.db');
+  if (!fs.existsSync(tmpDbPath)) {
+    if (fs.existsSync(dbPath)) {
+      try {
+        fs.copyFileSync(dbPath, tmpDbPath);
+      } catch (err) {
+        console.error('Failed to copy market.db to /tmp:', err);
+      }
+    }
+  }
+  if (fs.existsSync(tmpDbPath)) {
+    dbPath = tmpDbPath;
+  }
+}
+
 const db = new sqlite3.Database(dbPath);
 
 // Helper to run query with Promise
